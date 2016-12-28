@@ -29,9 +29,9 @@ GET /locations/:departure_stop/to/:arrived_stop
 [
   {
     "timetable_time": "17:33",
-    "route": "539系統",
+    "route": "539系統",
     "track": "不明",
-    "destination": "時任牧場前",
+    "destination": "時任牧場前",
     "location_stops_url": "http://hakobus.jp/s_route.php?diamasterkey=10000175&stopmasterkey_f=3&stopmasterkey_t=155&no_f=0&no_t=15#3",
     "bus": "標準のバス",
     "information": "約6分後に到着します",
@@ -39,19 +39,19 @@ GET /locations/:departure_stop/to/:arrived_stop
   },
   {
     "timetable_time": "17:40",
-    "route": "6333ループ121435",
+    "route": "6333ループ121435",
     "track": "不明",
-    "destination": "時任為基記念病院前・亀田市役所前方面",
+    "destination": "時任為基記念病院前・亀田市役所前方面",
     "location_stops_url": "http://hakobus.jp/s_route.php?diamasterkey=10001282&stopmasterkey_f=3&stopmasterkey_t=155&no_f=0&no_t=24#3",
     "bus": "ノンステップ",
-    "information": "定刻発車の予定",
+    "information": "定刻発車の予定",
     "timetable_url": "http://hakobus.jp/s_timetable_wd.php?s=11003&spm=15&d=9&generationcode=20161116"
   },
   {
     "timetable_time": "19:03",
-    "route": "9系統（時任大経由）",
+    "route": "9系統（時任大経由）",
     "track": "不明",
-    "destination": "時任大付属中学校前",
+    "destination": "時任大付属中学校前",
     "location_stops_url": "http://hakobus.jp/s_route.php?diamasterkey=10000160&stopmasterkey_f=3&stopmasterkey_t=155&no_f=0&no_t=15#3",
     "bus": "ノンステップ",
     "information": "不明",
@@ -74,19 +74,19 @@ GET /location?url=:locations_stops_url
 ```json
 {
   "route_name": "9系統（時任大経由）",
-  "starting_stop_name": "函館駅前",
-  "ending_stop_name": "時任大附属中学校前",
+  "starting_stop_name": "函館駅前",
+  "ending_stop_name": "時任大附属中学校前",
   "stops": [
     {
       "stop_name": "函館駅前 ５番のりば",
       "arrived_time": "17:34"
     },
     {
-      "stop_name": "松風町 (1)キラリス前",
+      "stop_name": "松風町 (1)キラリス前",
       "arrived_time": "17:38"
     },
     {
-      "stop_name": "松風町 (2)電停前",
+      "stop_name": "松風町 (2)電停前",
       "arrived_time": "17:41"
     },
     {
@@ -122,7 +122,7 @@ GET /location?url=:locations_stops_url
       "arrived_time": "17:56"
     },
     {
-      "stop_name": "亀田警察署前 ",
+      "stop_name": "亀田警察署前 ",
       "arrived_time": "17:57"
     },
     {
@@ -138,15 +138,15 @@ GET /location?url=:locations_stops_url
       "arrived_time": "18:04"
     },
     {
-      "stop_name": "亀田市役所前 (1)至赤川",
+      "stop_name": "亀田市役所前 (1)至赤川",
       "arrived_time": "18:08"
     },
     {
-      "stop_name": "時任地方気象台前 ",
+      "stop_name": "時任地方気象台前 ",
       "arrived_time": "18:09"
     },
     {
-      "stop_name": "亀田総合振興局前 ",
+      "stop_name": "亀田総合振興局前 ",
       "arrived_time": "18:12"
     },
     {
@@ -154,27 +154,27 @@ GET /location?url=:locations_stops_url
       "arrived_time": "18:12"
     },
     {
-      "stop_name": "伊勢崎長者町 ",
+      "stop_name": "伊勢崎長者町 ",
       "arrived_time": "18:13"
     },
     {
-      "stop_name": "亀田特別支援学校前 ",
+      "stop_name": "亀田特別支援学校前 ",
       "arrived_time": "18:14"
     },
     {
-      "stop_name": "時任大附属小学校前 ",
+      "stop_name": "時任大附属小学校前 ",
       "arrived_time": "18:16"
     },
     {
-      "stop_name": "時任台東 ",
+      "stop_name": "時任台東 ",
       "arrived_time": "18:17"
     },
     {
-      "stop_name": "湘南台団地入口 ",
+      "stop_name": "湘南台団地入口 ",
       "arrived_time": "18:17"
     },
     {
-      "stop_name": "湘南台 ",
+      "stop_name": "湘南台 ",
       "arrived_time": "18:18"
     },
     {
@@ -182,11 +182,11 @@ GET /location?url=:locations_stops_url
       "arrived_time": "18:19"
     },
     {
-      "stop_name": "時任第一公園 ",
+      "stop_name": "時任第一公園 ",
       "arrived_time": "18:19"
     },
     {
-      "stop_name": "湘南町会館前 ",
+      "stop_name": "湘南町会館前 ",
       "arrived_time": "18:21"
     },
     {
@@ -194,19 +194,19 @@ GET /location?url=:locations_stops_url
       "arrived_time": "18:21"
     },
     {
-      "stop_name": "時任大学前 ",
+      "stop_name": "時任大学前 ",
       "arrived_time": "18:23"
     },
     {
-      "stop_name": "亀田中部時任町 ",
+      "stop_name": "亀田中部時任町 ",
       "arrived_time": "18:24"
     },
     {
-      "stop_name": "時任為基記念病院前 ",
+      "stop_name": "時任為基記念病院前 ",
       "arrived_time": "18:25"
     },
     {
-      "stop_name": "時任大附属中学校前 ",
+      "stop_name": "時任大附属中学校前 ",
       "arrived_time": "18:26"
     }
   ]
