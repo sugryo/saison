@@ -434,9 +434,9 @@ fn get_location<'mw>(request: &mut Request, mut response: Response<'mw>) -> Midd
     let cap = re.captures(h3_text).unwrap();
     
     // Extract the route information
-    let route_name = cap.at(1).unwrap();
-    let starting_station_name = cap.at(2).unwrap();
-    let ending_station_name = cap.at(3).unwrap();
+    let route_name = cap.at(1).unwrap().trim();
+    let starting_station_name = cap.at(2).unwrap().trim();
+    let ending_station_name = cap.at(3).unwrap().trim();
 
     // font
     let font_selector = Selector::parse("font").unwrap();
@@ -452,8 +452,8 @@ fn get_location<'mw>(request: &mut Request, mut response: Response<'mw>) -> Midd
         let cap = re.captures(p_text).unwrap();
 
         // Extract the stop and arrived time
-        let stop_name = cap.name("stopname").unwrap();
-        let arrived_time = cap.name("arrivedname").unwrap();
+        let stop_name = cap.name("stopname").unwrap().trim();
+        let arrived_time = cap.name("arrivedname").unwrap().trim();
         println!("０番目：{}", cap.at(0).unwrap_or(""));
         println!("１番目：{}", cap.at(1).unwrap_or(""));
         println!("２番目：{}", cap.at(2).unwrap_or(""));
