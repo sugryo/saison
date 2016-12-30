@@ -6,6 +6,7 @@ extern crate scraper;
 extern crate chrono;
 extern crate rustc_serialize;
 extern crate regex;
+extern crate clap;
 
 use std::io::Read;
 use encoding::{Encoding, EncoderTrap, DecoderTrap};
@@ -19,6 +20,7 @@ use nickel::{Nickel, HttpRouter, MediaType, Request, Response, MiddlewareResult,
 use chrono::*;
 use rustc_serialize::json;
 use regex::Regex;
+use clap::{Arg, App};
 
 #[derive(Debug, RustcDecodable, RustcEncodable)]
 struct HBScrapingLocation {
@@ -477,9 +479,24 @@ fn get_location<'mw>(request: &mut Request, mut response: Response<'mw>) -> Midd
 }
 
 fn main() {
+    // Clap
+    let matches = App::new("Saison")
+        .version("0.0.1")
+        .author("Ryo Sugimoto <sugryo1109@gmail.com>")
+        .arg(Arg::with_name("port")
+             .short("p")
+             .long("port")
+             .value_name("PORT")
+             .help("Set a port")
+             .takes_value(true))
+        .get_matches();
+    let port = matches.value_of("port").unwrap_or("6767");
+    let listen = format!("localhost:{}", port);
+
+    // Nickel
     let mut server = Nickel::new();
     server.get("/hello_world", hello_world);
     server.get("/locations/:left_stop/to/:arrived_stop", get_locations);
     server.get("/location", get_location);
-    server.listen("localhost:6767");
+    server.listen(listen.as_str());
 }
