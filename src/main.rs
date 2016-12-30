@@ -11,9 +11,7 @@ use std::io::Read;
 use encoding::{Encoding, EncoderTrap, DecoderTrap};
 use encoding::all::WINDOWS_31J;
 use url::percent_encoding::{percent_encode, percent_decode, DEFAULT_ENCODE_SET};
-use url::percent_encoding::PercentDecode;
-use url::{Url, UrlQuery};
-use url::form_urlencoded::Serializer;
+use url::Url;
 use hyper::client;
 use scraper::{Html, Selector};
 use nickel::status::StatusCode;
@@ -465,7 +463,6 @@ fn get_location<'mw>(request: &mut Request, mut response: Response<'mw>) -> Midd
         });
     }
     println!("{:?}", route_stops);
-    let route_stops_json_encoded = json::encode(&route_stops).unwrap();
     let route_information = HBRouteInformation {
         route_name: route_name.to_string(),
         starting_stop_name: starting_station_name.to_string(),
