@@ -61,7 +61,7 @@ GET /locations/:departure_stop/to/:arrived_stop
 	  "timetable_url": "http://hakobus.jp/s_timetable_wd.php?s=11003&spm=14&d=9&generationcode=20161116"
 	}
   ],
-  "total": 4
+  "total": 3
 }
 ```
 
