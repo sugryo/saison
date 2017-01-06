@@ -507,6 +507,11 @@ fn not_found<'mw>(err: &mut NickelError, req: &mut Request) -> Action {
     Continue(())
 }
 
+fn enable_mediatype_json<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
+    res.set(MediaType::Json);
+    res.next_middleware()
+}
+
 fn main() {
     // Clap
     let matches = App::new("Saison")
@@ -524,6 +529,7 @@ fn main() {
 
     // Nickel
     let mut server = Nickel::new();
+    server.utilize(enable_mediatype_json);
     server.get("/hello_world", hello_world);
     server.get("/locations/:left_stop/to/:arrived_stop", get_locations);
     server.get("/location", get_location);
