@@ -1,12 +1,13 @@
 extern crate encoding;
 extern crate url;
-extern crate hyper;
+#[macro_use] extern crate hyper;
 extern crate scraper;
 #[macro_use] extern crate nickel;
 extern crate chrono;
 extern crate rustc_serialize;
 extern crate regex;
 extern crate clap;
+extern crate modifier;
 
 use std::io::{Read, Write};
 use encoding::{Encoding, EncoderTrap, DecoderTrap};
@@ -21,6 +22,7 @@ use chrono::*;
 use rustc_serialize::json;
 use regex::Regex;
 use clap::{Arg, App};
+use modifier::Modifier;
 
 #[derive(Debug, RustcDecodable, RustcEncodable)]
 struct HBScrapingLocation {
@@ -512,6 +514,21 @@ fn enable_mediatype_json<'mw>(_req: &mut Request, mut res: Response<'mw>) -> Mid
     res.next_middleware()
 }
 
+impl<'a, D> Modifier<nickel::Response<'a, D>> for XContentTypeOptions {
+    fn modify(self, res: &mut nickel::Response<'a, D>) {
+        res.headers_mut().set(self)
+    }
+}
+
+header! { (XContentTypeOptions, "X-Content-Type-Options") => [String] }
+fn enable_header_xcontenttypeoptions<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
+    //let mut headers = Headers::new();
+    //headers.set(XContentTypeOptions("nosniff".to_owned()));
+    //headers.set_raw("X-Content-Type-Options", vec![b"nosniff".to_vec()]);
+    res.set(XContentTypeOptions("nosniff".to_owned()));
+    res.next_middleware()
+}
+
 fn main() {
     // Clap
     let matches = App::new("Saison")
@@ -530,6 +547,7 @@ fn main() {
     // Nickel
     let mut server = Nickel::new();
     server.utilize(enable_mediatype_json);
+    server.utilize(enable_header_xcontenttypeoptions);
     server.get("/hello_world", hello_world);
     server.get("/locations/:left_stop/to/:arrived_stop", get_locations);
     server.get("/location", get_location);
