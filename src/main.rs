@@ -14,6 +14,7 @@ use encoding::all::WINDOWS_31J;
 use url::percent_encoding::{percent_encode, percent_decode, DEFAULT_ENCODE_SET};
 use url::Url;
 use hyper::client;
+use hyper::header::{CacheControl, CacheDirective};
 use scraper::{Html, Selector};
 use nickel::status::StatusCode;
 use nickel::{Nickel, HttpRouter, MediaType, Request, Response, MiddlewareResult, QueryString, Action, Continue, Halt, NickelError};
@@ -540,6 +541,11 @@ fn enable_header_xcontenttypeoptions<'mw>(_req: &mut Request, mut res: Response<
     res.next_middleware()
 }
 
+fn enable_cache_control<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
+    res.set(CacheControl(vec![CacheDirective::MaxAge(60u32)]));
+    res.next_middleware()
+}
+
 fn main() {
     // Clap
     let matches = App::new("Saison")
@@ -559,6 +565,7 @@ fn main() {
     let mut server = Nickel::new();
     server.utilize(enable_mediatype_json);
     server.utilize(enable_header_xcontenttypeoptions);
+    server.utilize(enable_cache_control);
     server.get("/hello_world", hello_world);
     server.get("/locations/:left_stop/to/:arrived_stop", get_locations);
     server.get("/location", get_location);
