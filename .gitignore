@@ -123,11 +123,7 @@ $RECYCLE.BIN/
 *.lnk
 
 ## Ignore Test Hakobus site
-h2o.conf
-index.html
-location.html
-result.html
-src/hakobus.txt
+scraping/
 
 ## Local Webpage
 aoyagi/
