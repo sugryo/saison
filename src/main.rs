@@ -502,6 +502,24 @@ fn not_found<'mw>(err: &mut NickelError, _req: &mut Request) -> Action {
     Continue(())
 }
 
+fn bad_request<'mw>(err: &mut NickelError, _req: &mut Request) -> Action {
+    if let Some(ref mut res) = err.stream {
+        if res.status() == StatusCode::BadRequest {
+            let error = Error {
+                code: 2,
+                message: "要求の形式が正しくありません。".to_string(),
+            };
+            let errors = Errors {
+                errors: vec![error],
+            };
+            res.write_all(json::encode(&errors).unwrap().as_bytes());
+            return Halt(())
+        }
+    }
+
+    Continue(())
+}
+
 fn enable_mediatype_json<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     res.set(MediaType::Json);
     res.next_middleware()
@@ -546,6 +564,8 @@ fn main() {
     server.get("/location", get_location);
 
     // Handle Error
+    let bad_request_400: fn(&mut NickelError, &mut Request) -> Action = bad_request;
+    server.handle_error(bad_request_400);
     let not_found_404: fn(&mut NickelError, &mut Request) -> Action = not_found;
     server.handle_error(not_found_404);
     server.listen(listen.as_str());
