@@ -3,7 +3,6 @@ extern crate url;
 #[macro_use] extern crate hyper;
 extern crate scraper;
 #[macro_use] extern crate nickel;
-extern crate chrono;
 extern crate rustc_serialize;
 extern crate regex;
 extern crate clap;
@@ -18,7 +17,6 @@ use hyper::client;
 use scraper::{Html, Selector};
 use nickel::status::StatusCode;
 use nickel::{Nickel, HttpRouter, MediaType, Request, Response, MiddlewareResult, QueryString, Action, Continue, Halt, NickelError};
-use chrono::*;
 use rustc_serialize::json;
 use regex::Regex;
 use clap::{Arg, App};
@@ -204,10 +202,6 @@ fn get_locations<'mw>(req: &mut Request, mut response: Response<'mw>) -> Middlew
         let div_id_container_selector = Selector::parse("div#container").unwrap();
         let div_id_container = html.select(&div_id_container_selector).next().unwrap();
 
-        // div#contents
-        let div_id_contents_selector = Selector::parse("div#contents").unwrap();
-        let div_id_contents = div_id_container.select(&div_id_contents_selector).next().unwrap();
-
         // div#result
         let div_id_result_selector = Selector::parse("div#result").unwrap();
         let div_id_result = div_id_container.select(&div_id_result_selector).next().unwrap();
@@ -222,7 +216,6 @@ fn get_locations<'mw>(req: &mut Request, mut response: Response<'mw>) -> Middlew
 
         // tr
         let tr_selector = Selector::parse("tr").unwrap();
-        let tr = tbody.select(&tr_selector).next().unwrap(); // Delete
         
         let mut locations = Vec::new();
         for location_row in tbody.select(&tr_selector) {
@@ -491,7 +484,7 @@ struct Errors{
     errors: Vec<Error>
 }
 
-fn not_found<'mw>(err: &mut NickelError, req: &mut Request) -> Action {
+fn not_found<'mw>(err: &mut NickelError, _req: &mut Request) -> Action {
     if let Some(ref mut res) = err.stream {
         if res.status() == StatusCode::NotFound {
             let error = Error {
