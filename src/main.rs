@@ -8,7 +8,7 @@ extern crate rustc_serialize;
 extern crate regex;
 extern crate clap;
 
-use std::io::Read;
+use std::io::{Read, Write};
 use encoding::{Encoding, EncoderTrap, DecoderTrap};
 use encoding::all::WINDOWS_31J;
 use url::percent_encoding::{percent_encode, percent_decode, DEFAULT_ENCODE_SET};
@@ -16,7 +16,7 @@ use url::Url;
 use hyper::client;
 use scraper::{Html, Selector};
 use nickel::status::StatusCode;
-use nickel::{Nickel, HttpRouter, MediaType, Request, Response, MiddlewareResult, QueryString};
+use nickel::{Nickel, HttpRouter, MediaType, Request, Response, MiddlewareResult, QueryString, Action, Continue, Halt, NickelError};
 use chrono::*;
 use rustc_serialize::json;
 use regex::Regex;
@@ -478,6 +478,35 @@ fn get_location<'mw>(request: &mut Request, mut response: Response<'mw>) -> Midd
     response.send(route_information_json_encoded)
 }
 
+#[derive(Debug, RustcEncodable)]
+struct Error {
+    code: i32,
+    message: String,
+}
+
+#[derive(Debug, RustcEncodable)]
+struct Errors{
+    errors: Vec<Error>
+}
+
+fn not_found<'mw>(err: &mut NickelError, req: &mut Request) -> Action {
+    if let Some(ref mut res) = err.stream {
+        if res.status() == StatusCode::NotFound {
+            let error = Error {
+                code: 1,
+                message: "要求されたルーティングは存在しません。".to_string(),
+            };
+            let errors = Errors {
+                errors: vec![error],
+            };
+            res.write_all(json::encode(&errors).unwrap().as_bytes());
+            return Halt(())
+        }
+    }
+
+    Continue(())
+}
+
 fn main() {
     // Clap
     let matches = App::new("Saison")
@@ -498,5 +527,9 @@ fn main() {
     server.get("/hello_world", hello_world);
     server.get("/locations/:left_stop/to/:arrived_stop", get_locations);
     server.get("/location", get_location);
+
+    // Handle Error
+    let not_found_404: fn(&mut NickelError, &mut Request) -> Action = not_found;
+    server.handle_error(not_found_404);
     server.listen(listen.as_str());
 }
