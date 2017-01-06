@@ -36,6 +36,14 @@ struct HBScrapingLocation {
 }
 
 #[derive(Debug, RustcDecodable, RustcEncodable)]
+struct HBLocations {
+    starting_stop_name: String,
+    ending_stop_name: String,
+    locations: Vec<HBScrapingLocation>,
+    total: u32,
+}
+
+#[derive(Debug, RustcDecodable, RustcEncodable)]
 struct HBRouteStop {
     stop_name: String,
     arrived_time: String,
@@ -189,6 +197,7 @@ fn get_locations<'mw>(req: &mut Request, mut response: Response<'mw>) -> Middlew
     res.read_to_end(&mut shift_jis_body).unwrap();
 
     let mut hb_scraping_locations = Vec::new();
+    let mut total: u32 = 0;
     if let Ok(body) = WINDOWS_31J.decode(&shift_jis_body, DecoderTrap::Strict) {
         ////                        println!("{}", body);
         
@@ -377,12 +386,19 @@ fn get_locations<'mw>(req: &mut Request, mut response: Response<'mw>) -> Middlew
                 timetable_url: location[7].clone().unwrap(),
             };
             hb_scraping_locations.push(hb_scraping_location);
+            total += 1
         }
         //println!("{:?}", &hb_scraping_locations);
     }
-    let hb_scraping_locations_json_encoded = json::encode(&hb_scraping_locations).unwrap();
+    let hb_locations = HBLocations {
+        starting_stop_name: left_stop_name,
+        ending_stop_name: arrived_stop_name,
+        locations: hb_scraping_locations,
+        total: total,
+    };
+    let hb_locations_json_encoded = json::encode(&hb_locations).unwrap();
     response.set(MediaType::Json);
-    response.send(hb_scraping_locations_json_encoded)
+    response.send(hb_locations_json_encoded)
 }
 
 fn get_location<'mw>(request: &mut Request, mut response: Response<'mw>) -> MiddlewareResult<'mw> {
