@@ -177,7 +177,7 @@ fn get_locations<'mw>(req: &mut Request, mut response: Response<'mw>) -> Middlew
     let arrived_stop_name = percent_decode(&arrived_stop_percent_encoded.as_bytes()).decode_utf8_lossy().to_string();
     
     //println!("乗車停留所：{}", left_stop_name);
-    //println!("下車停留所：{}", arrived_stop_name);
+    println!("下車停留所：{}", arrived_stop_name);
     
     // Get Stop Id
     let stop_id = get_stop_id(&left_stop_name, &arrived_stop_name).unwrap();
@@ -555,6 +555,24 @@ fn internal_server_error<'mw>(err: &mut NickelError, _req: &mut Request) -> Acti
     Continue(())
 }
 
+fn service_unavaliable<'mw>(err: &mut NickelError, _req: &mut Request) -> Action {
+    if let Some(ref mut res) = err.stream {
+        if res.status() == StatusCode::ServiceUnavailable {
+            let error = Error {
+                code: 4,
+                message: "ただいま、Saison をご利用いただけません。しばらく経ってから、再度アクセスしてください。".to_string(),
+            };
+            let errors = Errors {
+                errors: vec![error],
+            };
+            res.write_all(json::encode(&errors).unwrap().as_bytes());
+            return Halt(())
+        }
+    }
+
+    Continue(())
+}
+
 fn enable_mediatype_json<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     res.set(MediaType::Json);
     res.next_middleware()
@@ -611,5 +629,7 @@ fn main() {
     server.handle_error(not_found_404);
     let internal_server_error_500: fn(&mut NickelError, &mut Request) -> Action = internal_server_error;
     server.handle_error(internal_server_error_500);
+    let service_unavaliable_503: fn(&mut NickelError, &mut Request) -> Action = service_unavaliable;
+    server.handle_error(service_unavaliable_503);
     server.listen(listen.as_str());
 }
