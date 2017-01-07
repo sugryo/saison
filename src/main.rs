@@ -537,6 +537,24 @@ fn bad_request<'mw>(err: &mut NickelError, _req: &mut Request) -> Action {
     Continue(())
 }
 
+fn internal_server_error<'mw>(err: &mut NickelError, _req: &mut Request) -> Action {
+    if let Some(ref mut res) = err.stream {
+        if res.status() == StatusCode::InternalServerError {
+            let error = Error {
+                code: 3,
+                message: "Saison 内部でエラーが発生しました。".to_string(),
+            };
+            let errors = Errors {
+                errors: vec![error],
+            };
+            res.write_all(json::encode(&errors).unwrap().as_bytes());
+            return Halt(())
+        }
+    }
+
+    Continue(())
+}
+
 fn enable_mediatype_json<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     res.set(MediaType::Json);
     res.next_middleware()
@@ -591,5 +609,7 @@ fn main() {
     server.handle_error(bad_request_400);
     let not_found_404: fn(&mut NickelError, &mut Request) -> Action = not_found;
     server.handle_error(not_found_404);
+    let internal_server_error_500: fn(&mut NickelError, &mut Request) -> Action = internal_server_error;
+    server.handle_error(internal_server_error_500);
     server.listen(listen.as_str());
 }
