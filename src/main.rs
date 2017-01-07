@@ -573,6 +573,24 @@ fn service_unavaliable<'mw>(err: &mut NickelError, _req: &mut Request) -> Action
     Continue(())
 }
 
+fn gateway_timeout<'mw>(err: &mut NickelError, _req: &mut Request) -> Action {
+    if let Some(ref mut res) = err.stream {
+        if res.status() == StatusCode::ServiceUnavailable {
+            let error = Error {
+                code: 4,
+                message: "ただいま、Saison をご利用いただけません。しばらく経ってから、再度アクセスしてください。".to_string(),
+            };
+            let errors = Errors {
+                errors: vec![error],
+            };
+            res.write_all(json::encode(&errors).unwrap().as_bytes());
+            return Halt(())
+        }
+    }
+
+    Continue(())
+}
+
 fn enable_mediatype_json<'mw>(_req: &mut Request, mut res: Response<'mw>) -> MiddlewareResult<'mw> {
     res.set(MediaType::Json);
     res.next_middleware()
@@ -631,5 +649,7 @@ fn main() {
     server.handle_error(internal_server_error_500);
     let service_unavaliable_503: fn(&mut NickelError, &mut Request) -> Action = service_unavaliable;
     server.handle_error(service_unavaliable_503);
+    let gateway_timeout_504: fn(&mut NickelError, &mut Request) -> Action = gateway_timeout;
+    server.handle_error(gateway_timeout_504);
     server.listen(listen.as_str());
 }
