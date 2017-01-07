@@ -7,8 +7,15 @@ extern crate rustc_serialize;
 extern crate regex;
 extern crate clap;
 extern crate modifier;
+#[macro_use] extern crate slog;
+extern crate slog_term;
+extern crate slog_json;
+extern crate slog_stream;
+extern crate slog_stdlog;
+#[macro_use] extern crate log;
 
 use std::io::{Read, Write};
+//use std::io;
 use encoding::{Encoding, EncoderTrap, DecoderTrap};
 use encoding::all::WINDOWS_31J;
 use url::percent_encoding::{percent_encode, percent_decode, DEFAULT_ENCODE_SET};
@@ -22,6 +29,8 @@ use rustc_serialize::json;
 use regex::Regex;
 use clap::{Arg, App};
 use modifier::Modifier;
+use std::fs::OpenOptions;
+use slog::DrainExt;
 
 #[derive(Debug, RustcDecodable, RustcEncodable)]
 struct HBScrapingLocation {
@@ -627,10 +636,49 @@ fn main() {
              .value_name("PORT")
              .help("Set a port")
              .takes_value(true))
+        .arg(Arg::with_name("logfile")
+             .short("l")
+             .long("log-file")
+             .value_name("LOGFILE")
+             .help("Set a log file name, Default: log.json")
+             .takes_value(true))
+        .arg(Arg::with_name("environment")
+             .short("e")
+             .value_name("ENVIRONMENT")
+             .help("Set a environment, Example: debug, production, test")
+             .takes_value(true))
         .get_matches();
     let port = matches.value_of("port").unwrap_or("6767");
     let listen = format!("localhost:{}", port);
 
+    // Slog
+    let environment = match matches.value_of("environment") {
+        None => "debug",
+        Some(v) => v,
+    };
+    
+    fn debug() -> slog::Logger {
+        let console_drain = slog_term::streamer().build();
+        slog::Logger::root(console_drain.fuse(), o!())
+    }
+
+    fn production(matches: &clap::ArgMatches) -> slog::Logger {
+        let log_path = matches.value_of("logfile").unwrap_or("log.json");
+        let file = OpenOptions::new()
+            .create(true)
+            .write(true)
+            .append(true)
+            .open(log_path).unwrap();
+        let file_drain = slog_stream::stream(file, slog_json::default());
+        slog::Logger::root(file_drain.fuse(), o!())
+    }
+    
+    let logger = match environment {
+        "production" => production(&matches),
+        _ => debug(),
+    };
+    slog_stdlog::set_logger(logger).unwrap();
+    
     // Nickel
     let mut server = Nickel::new();
     server.utilize(enable_mediatype_json);
