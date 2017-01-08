@@ -218,5 +218,5 @@ GET /location?url=:locations_stops_url
 ```
 
 ## LICENSE
-Copyright (c) 2016 Ryo Sugimoto  
+Copyright (c) 2016, 2017 Ryo Sugimoto  
 See LICENSE
