@@ -16,12 +16,11 @@
 ```sh
 GET /locations/:departure_stop/to/:arrived_stop
 ```
-- departure_stop
-  - 出発停留所
-  - Example: 函館駅前
-- arrived_stop
-  - 到着停留所
-  - Example: 千代台
+|項目|型|説明|
+|:--:|:-:|:-:|
+|departure_stop|string|出発停留所|
+|arrived_stop|string|到着停留所|
+**＊停留所名を、UTF-8 でURLエンコードしてください。**
 
 #### レスポンス
 ``` Status: 200 Ok ```
@@ -69,10 +68,10 @@ GET /locations/:departure_stop/to/:arrived_stop
 ```sh
 GET /location?url=:locations_stops_url
 ```
-- locations_stops_url
-  - 経路情報URL
-  - URL を URL エンコードしてください。
-  - Example: http%3A%2F%2Fhakobus.jp%2Fs_route.php%3Fdiamasterkey%3D10000160%26stopmasterkey_f%3D3%26stopmasterkey_t%3D155%26no_f%3D0%26no_t%3D15%233
+|項目|型|説明|
+|:--:|:-:|:-:|
+|locations_stops_url|string|経路情報URL|
+**＊経路情報URLを、UTF-8でURLエンコードしてください。**
 
 #### レスポンス
 ``` Status: 200 Ok ```
