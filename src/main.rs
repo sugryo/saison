@@ -625,6 +625,16 @@ fn enable_cache_control<'mw>(_req: &mut Request, mut res: Response<'mw>) -> Midd
     res.next_middleware()
 }
 
+struct SaisonLogger(slog::Logger);
+
+impl<D> nickel::Middleware<D> for SaisonLogger {
+    fn invoke<'mw, 'conn>(&self, req: &mut Request<'mw, 'conn, D>, res: Response<'mw, D>)
+                          -> MiddlewareResult<'mw, D> {
+        slog_debug!(self.0, req.path_without_query().unwrap(); "method" => req.origin.method.as_ref(), "uri" => req.origin.uri.to_string());
+        res.next_middleware()
+    }
+}
+
 fn main() {
     // Clap
     let matches = App::new("Saison")
@@ -677,10 +687,11 @@ fn main() {
         "production" => production(&matches),
         _ => debug(),
     };
-    slog_stdlog::set_logger(logger).unwrap();
     
     // Nickel
     let mut server = Nickel::new();
+    slog_info!(logger, "Staring Saison");
+    server.utilize(SaisonLogger(logger));
     server.utilize(enable_mediatype_json);
     server.utilize(enable_header_xcontenttypeoptions);
     server.utilize(enable_cache_control);
